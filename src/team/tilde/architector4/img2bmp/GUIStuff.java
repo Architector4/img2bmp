@@ -290,7 +290,7 @@ public class GUIStuff extends JPanel implements ActionListener{
 						,IOStuff.switchExtension(out,"bmp")
 						,true,false);
 				
-				println(result);
+				println(result!=null?result:"Done!");
 			}else{
 				//Multi file save...
 				for(File i:input){
