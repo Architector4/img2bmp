@@ -13,7 +13,7 @@ img2bmp.jar is the compiled file ready to use.
 
 If no output is specified, the result is saved alongside input image with .bmp extension.
 
-If the original file has .bmp extension by itself, it will give the "file exists" error.
+If the original file has .bmp extension by itself and `-o` is not specified, it will give the "file exists" error.
 
 
 If no parameters are specified, it will open a GUI with 2 buttons and a log text box.
