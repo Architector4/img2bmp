@@ -4,14 +4,16 @@ package team.tilde.architector4.img2bmp;
 import java.io.File;
 import java.util.stream.IntStream;
 
+import javax.swing.filechooser.FileFilter;
+
 public class IMG2BMP{
-	
+
 	static final String credit =
 			"IMG2BMP Converter\r\n"
-			+"By Architector #4, 2019\r\n";
+					+"By Architector #4, 2019\r\n";
 	static final String purpose =
 			"Converts images to BMP format with a specific palette.\r\n"
-			+"Made as a tool to make valid sprites for \"Cortex Command\" videogame.\r\n";
+					+"Made as a tool to make valid sprites for \"Cortex Command\" videogame.\r\n";
 
 	static final String helpMessage=
 			credit
@@ -20,7 +22,8 @@ public class IMG2BMP{
 			+"Converts input image to an 8-bit BMP file with custom palette\r\n"
 			+"If no output is specified, the image is saved with the input's name, "
 			+ "but with .bmp extension.\r\n\r\n"
-			+"Tags:\r\n"+"-h: Print this help and exit\r\n"+"-o: Overwrite output if exists\r\n";
+			+"Tags:\r\n"+"-h: Print this help and exit\r\n"
+			+"-o: Overwrite output if exists\r\n";
 
 	public static final void main(String[] args){
 		// String workdir = System.getProperty("user.dir");
@@ -82,19 +85,40 @@ public class IMG2BMP{
 
 		if(outputAuto){
 			output=IOStuff.switchExtension(new File(input),"bmp");
-//			File outFile=new File(output);
-//			String outputname=outFile.getName();// outputpath[outputpath.length-1].split("\\.");
-//												// //ConvertStuff.split(outputpath[outputpath.length-1],'.');
-//			if(outputname.lastIndexOf('.')!=-1){
-//				outputname=outputname.substring(0,outputname.lastIndexOf('.'));
-//			}
-//			outputname+=".bmp";
-//			output=(outFile.getParent()==null)?(outputname):(outFile.getParent()+File.separator+outputname);
 		}
 
-		final String result=IOStuff.convertImageHumanized(input,output,outputOverwrite,true);
-		if(result!=null)
-			System.err.println(result);
+		if(new File(input).isDirectory()){
+			java.util.ArrayList<Job> jobs = jobUtils.convertFolder(
+					new File(input)
+					,new File(input)
+					,new File(output)
+					,(FileFilter)new GUIStuff.ImageFilter());
+
+			for(Job u:jobs){
+				System.out.println("Converting "+u.inFile.getAbsolutePath()+"...");
+				String result = IOStuff.convertImageHumanized(
+						u.inFile.getAbsolutePath()
+						,IOStuff.switchExtension(u.outFile,"bmp")
+						,outputOverwrite,true);
+
+				if(result!=null)
+					System.out.println(result);
+			}
+			System.out.println("Done!");
+
+		}else{
+			final String result=IOStuff.convertImageHumanized(input,output,outputOverwrite,true);
+			if(result!=null)
+				System.err.println(result);
+		}
 		return;
 	}
 }
+
+
+
+
+
+
+
+

@@ -204,7 +204,7 @@ public class GUIStuff extends JPanel implements ActionListener{
 	}
 
 
-	public class ImageFilter extends FileFilter{
+	public static class ImageFilter extends FileFilter{
 		//True if the input file exists, an image or a folder.
 		public boolean accept(File f){
 			if(f.isDirectory()) return true;
