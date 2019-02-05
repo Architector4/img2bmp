@@ -43,7 +43,7 @@ public class IOStuff{
 		
 		byte[] bytes;
 		try{
-			bytes = ConvertStuff.toBMP(ConvertStuff.imgTo2D(inImage));
+			bytes = ConvertStuff.toBMP(inImage);
 		}catch(Exception e){
 			System.out.println(e);
 			e.printStackTrace();
