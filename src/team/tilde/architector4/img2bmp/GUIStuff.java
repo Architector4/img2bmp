@@ -1,5 +1,6 @@
 package team.tilde.architector4.img2bmp;
 
+import java.io.File;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -7,16 +8,18 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.*;
+
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
-import java.io.File;
+import javax.swing.text.BadLocationException;
 
-public class GUIStuff extends JPanel implements ActionListener{
-
-	private static final long serialVersionUID=674585998342284178L;
-	//I'll be honest, I don't know what this serial thing is, but, eh. 
-	//One Eclipse warning more, one Eclipse warning less. lol
-	//...Also, shouldn't this be named SERIAL_VERSION_UID, considering it's final static whatever?
+public class GUIStuff implements ActionListener{
 
 	File[] input;
 	File inputRoot;
@@ -29,7 +32,7 @@ public class GUIStuff extends JPanel implements ActionListener{
 	JFileChooser fileChooserSave;
 
 	JFrame frame;
-	
+
 	volatile boolean busy = false;
 
 
@@ -45,7 +48,7 @@ public class GUIStuff extends JPanel implements ActionListener{
 
 		saveButton=new JButton("Save as BMP");
 		saveButton.setEnabled(false);
-		saveButton.setToolTipText("Save the selection as .bmp files somewhere.");
+		saveButton.setToolTipText("Save the selection as .bmp file(s) somewhere.");
 		//saveButton.setActionCommand("saveButton");
 		saveButton.setMargin(new Insets(8,0,8,0));
 		saveButton.addActionListener(this);
@@ -118,65 +121,40 @@ public class GUIStuff extends JPanel implements ActionListener{
 
 	}
 
-	public void actionPerformed(ActionEvent e){
+	public void actionPerformed(ActionEvent e){ //A button was pressed!
 		if(e.getSource()==selectButton){
 			fileChooserSelect.setCurrentDirectory(fileChooserSave.getCurrentDirectory());
-			final int returnVal=fileChooserSelect.showDialog(this,"Select");
+			final int returnVal=fileChooserSelect.showDialog(frame,"Select");
 			if(returnVal==JFileChooser.APPROVE_OPTION){
 
-				input=fileChooserSelect.getSelectedFiles(); //USER CAN CHOOSE NONEXISTENT FILES O_O
+				input=fileChooserSelect.getSelectedFiles();
 				inputRoot=fileChooserSelect.getCurrentDirectory();
 
 				fileChooserSave.setCurrentDirectory(inputRoot);
 
 				if(input.length==1){
-					try{
-						println("Selected "
-										+(input[0].isDirectory()?"folder ":"file ")
-										+input[0].getAbsolutePath());
-
-
-						saveButton.setEnabled(true);
-
-						//System.out.println(input[0].getAbsolutePath());
-						//Hmm, ImageIO understands more image formats than ImageIcon...
-						//image.setIcon(new ImageIcon(ImageIO.read(input[0])));
-						//image.setText("");
-					}catch(Exception e1){
-						//image.setIcon(null);
-						//image.setText("Failed loading image "+input[0].getAbsolutePath());
-						println("We had an error thinking about that 1 file: "+e1.toString());
-					}
+					println("Selected "
+							+(input[0].isDirectory()?"folder ":"file ")
+							+input[0].getAbsolutePath());
 				}else if(input.length!=0){
 					//image.setIcon(null);
 					//image.setText("Multiple files selected");
 					println("Selected:");
 					for(File i:input){
 						println("  "+i.getAbsolutePath());
-						saveButton.setEnabled(true);
 					}
 				}
+				saveButton.setEnabled(true);
 			}
-			//try{ //I forgot where that is from but that looks scary.
-			//// javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			//// 	
-			//// });
-			//// (new Thread(new JFrameTest())).start();
-			//	new Task().execute();
-			//}catch(Exception e2){
-			//}
 		} else if(e.getSource()==saveButton){
+			//Basically starts function convertStuff() which is below.
 			new Task().execute();
 		}
 	}
 
 	class Task extends SwingWorker<Void,Void>{
-
-		@Override
 		protected Void doInBackground() throws Exception{
-			//bun();
 			convertStuff();
-
 			return null;
 		}
 	}
@@ -199,13 +177,27 @@ public class GUIStuff extends JPanel implements ActionListener{
 			textArea.setCaretPosition(textArea.getDocument().getLength());
 		}
 	}
+
+	public void replaceLastLine(String text){
+		try{
+			textArea.replaceRange(
+					text,
+					textArea.getLineStartOffset(textArea.getLineCount()-1),
+					textArea.getLineEndOffset(textArea.getLineCount()-1)
+					);
+			
+		}catch(BadLocationException e){
+			//This literally can't happen.
+		}
+	}
+
 	public void println(String text){
 		if(text!=null) print(text+"\r\n");
 	}
 
 
 	public static class ImageFilter extends FileFilter{
-		//True if the input file exists, an image or a folder.
+		//True if the input file is an image or a folder.
 		public boolean accept(File f){
 			if(f.isDirectory()) return true;
 
@@ -219,13 +211,14 @@ public class GUIStuff extends JPanel implements ActionListener{
 			if(extension.equals("bmp"	)) 	return true; 
 			return false;
 		}
-		
+
 		public String getDescription(){
 			return "Images (.bmp, .png, .jpg, .jpeg, .gif, .tif, .tiff)";
 		}
 	}
 
 	public class DirectoryFilter extends FileFilter{
+		//True if the input is a folder
 		public boolean accept(File f){
 			if(f.isDirectory()) return true;
 			return false;
@@ -253,13 +246,6 @@ public class GUIStuff extends JPanel implements ActionListener{
 	}
 
 
-	// private String spookystring(int len){
-	// String out="";
-	// for(int i=0;i<len;i++){
-	// out+=Character.toString((char)new Random().nextInt(500));
-	// }
-	// return out;
-	// }
 
 	public void convertStuff(){
 
@@ -276,7 +262,7 @@ public class GUIStuff extends JPanel implements ActionListener{
 		fileChooserSave.setFileFilter(multi?new DirectoryFilter():new BMPFilter());
 		fileChooserSave.setFileSelectionMode(
 				multi?JFileChooser.DIRECTORIES_ONLY:JFileChooser.FILES_ONLY);
-		int returnVal = fileChooserSave.showDialog(this,multi?"Save to":"Save as");
+		int returnVal = fileChooserSave.showDialog(frame,multi?"Save to":"Save as");
 		if(returnVal==JFileChooser.APPROVE_OPTION){
 			File out = fileChooserSave.getSelectedFile();
 			fileChooserSelect.setCurrentDirectory(fileChooserSave.getCurrentDirectory());
@@ -288,8 +274,8 @@ public class GUIStuff extends JPanel implements ActionListener{
 				String result = IOStuff.convertImageHumanized(
 						input[0].getAbsolutePath()
 						,IOStuff.switchExtension(out,"bmp")
-						,true,false);
-				
+						,true,false,this);
+
 				println(result!=null?result:"Done!");
 			}else{
 				//Multi file save...
@@ -299,14 +285,14 @@ public class GUIStuff extends JPanel implements ActionListener{
 							,i
 							,out
 							,(FileFilter)new ImageFilter());
-					
+
 					for(Job u:jobs){
 						println("Converting "+u.inFile.getAbsolutePath()+"...");
 						String result = IOStuff.convertImageHumanized(
 								u.inFile.getAbsolutePath()
 								,IOStuff.switchExtension(u.outFile,"bmp")
-								,true,false);
-						
+								,true,false,this);
+
 						println(result);
 					}
 				}

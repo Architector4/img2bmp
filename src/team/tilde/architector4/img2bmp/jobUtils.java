@@ -1,7 +1,7 @@
 package team.tilde.architector4.img2bmp;
+
 import java.io.File;
 import java.util.ArrayList;
-
 import javax.swing.filechooser.FileFilter;
 
 public class jobUtils{

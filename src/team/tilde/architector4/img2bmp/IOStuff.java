@@ -1,15 +1,11 @@
 package team.tilde.architector4.img2bmp;
+
 import java.io.File;
-import java.io.FileOutputStream;
 
 public class IOStuff{
 
 	public static void saveBytes(String path,byte[] in) throws java.io.IOException{
-		// String[] path2=ConvertStuff.split(path,'.');
-		// path2[path2.length-1]="";
-		// if(ConvertStuff.split(path,'.').length>1){path=ConvertStuff.join(path2,".");}
-		// path+="bmp";
-			FileOutputStream stream=new FileOutputStream(path);
+			java.io.FileOutputStream stream=new java.io.FileOutputStream(path);
 			try{
 				stream.write(in);
 			}finally{
@@ -18,14 +14,14 @@ public class IOStuff{
 	}
 
 
-	public static byte convertImage(String inPath,String out, boolean overwrite){
+	public static byte convertImage(String inPath,String out, boolean overwrite,GUIStuff gui){
 		
 		File in = new File(inPath);
 		
 		if(!in.exists()) return 1; //Input image doesn't exist
 		
 		if(in.isDirectory()){
-			return 2; //Is directory - not implemented yet.
+			return 2; //Is directory. Look in IMG2BMP.java from line 89 to see how to handle them.
 		}
 		
 		
@@ -40,40 +36,34 @@ public class IOStuff{
 		if(outfile.exists())
 			if(!overwrite) 
 				return 4; //File already exists
+
+		if(outfile.exists()&&!outfile.delete())
+			return 5; //Failed deleting old file
 		
-		byte[] bytes;
 		try{
-			bytes = ConvertStuff.toBMP(inImage);
+			try{
+				java.nio.file.Files.createDirectories(outfile.getParentFile().toPath());
+			}catch(Exception e){} // Either it already exists, or the next catch's gonna handle that
+			ConvertStuff.toBMP(inImage,out,gui);
 		}catch(Exception e){
 			System.out.println(e);
 			e.printStackTrace();
-			return 5; //Failed converting image
+			return 6; //Failed saving image
 		}
-		try{
-			if(outfile.exists()&&!outfile.delete())
-				return 6; //Failed deleting old file
 			
-			try{
-				java.nio.file.Files.createDirectories(outfile.getParentFile().toPath());
-			}catch(Exception e){}
-			
-			IOStuff.saveBytes(out,bytes);
-			return 0; //Success
-		}catch(Exception e){
-			System.out.println(e);
-			return 7; //Failed saving image
-		}
+		return 0;
 	}
 
 	public static String convertImageHumanized(
 		String inPath,
 		String out,
 		boolean overwrite,
-		boolean commandline
+		boolean commandline,
+		GUIStuff gui
 	){
 		
 		
-		byte result = convertImage(inPath,out,overwrite);
+		byte result = convertImage(inPath,out,overwrite,gui);
 			 if(result==1)
 			return inPath+": Input image doesn't exist!";
 		else if(result==2)
@@ -84,11 +74,9 @@ public class IOStuff{
 			return out+": Image already exists!"
 			+(commandline?" Set tag -o to overwrite instead.":"");
 		else if(result==5)
-			return inPath+": Failed converting image! Out of memory?";	
+			return inPath+": Failed overwriting old file! No permission?";	
 		else if(result==6)
-			return out+": Failed overwriting old file! No permission?";
-		else if(result==7)
-			return out+": Failed writing image! Do you have access to the output path/file?";
+			return out+": Failed writing image! No space? No permission?";
 
 			return null;
 	}

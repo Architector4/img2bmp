@@ -1,10 +1,6 @@
 package team.tilde.architector4.img2bmp;
 
-//impart java.util.Scanner;
 import java.io.File;
-import java.util.stream.IntStream;
-
-import javax.swing.filechooser.FileFilter;
 
 public class IMG2BMP{
 
@@ -49,7 +45,7 @@ public class IMG2BMP{
 								System.out.println(helpMessage);
 							}
 						}else{
-							IntStream chars=args[argsoffset].substring(1).chars();
+							java.util.stream.IntStream chars=args[argsoffset].substring(1).chars();
 							for(int i:chars.toArray()){
 
 								if((char)i=='h'){
@@ -92,22 +88,26 @@ public class IMG2BMP{
 					new File(input)
 					,new File(input)
 					,new File(output)
-					,(FileFilter)new GUIStuff.ImageFilter());
+					,(javax.swing.filechooser.FileFilter)new GUIStuff.ImageFilter());
 
 			for(Job u:jobs){
-				System.out.println("Converting "+u.inFile.getAbsolutePath()+"...");
+				//				System.out.println("Converting "+u.inFile.getAbsolutePath()+"...");
 				String result = IOStuff.convertImageHumanized(
 						u.inFile.getAbsolutePath()
 						,IOStuff.switchExtension(u.outFile,"bmp")
-						,outputOverwrite,true);
+						,outputOverwrite,true,null);
 
 				if(result!=null)
-					System.out.println(result);
+					System.err.println(result);
 			}
-			System.out.println("Done!");
+			//			System.out.println("Done!");
 
 		}else{
-			final String result=IOStuff.convertImageHumanized(input,output,outputOverwrite,true);
+			final String result=IOStuff.convertImageHumanized(
+					input,
+					output,
+					outputOverwrite,
+					true,null);
 			if(result!=null)
 				System.err.println(result);
 		}

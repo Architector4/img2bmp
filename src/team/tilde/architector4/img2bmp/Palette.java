@@ -1,15 +1,11 @@
 package team.tilde.architector4.img2bmp;
 
-public final class Palette{
+
+
+public class Palette{ //On another though I should have probably put that as a resource or something
 	//This is a palette of colors from a BMP image from Cortex Command videogame.
 	//I'm not sure if ripping a BMP color palette is a copyright violation though... :v
-	static final byte[] PALETTE={
-			-1,0,-1,0,
-			56,56,72,0,
-			72,72,88,0,
-			104,104,121,0,
-			-29,-26,-8,0,
-			-1,-17,
+	static final byte[] PALETTE={-1,0,-1,0,56,56,72,0,72,72,88,0,104,104,121,0,-29,-26,-8,0,-1,-17,
 			79,0,15,24,74,0,32,40,88,0,36,40,123,0,56,56,88,0,8,8,59,0,9,28,-128,0,11,27,-88,0,9,26,
 			-25,0,77,88,107,0,88,103,120,0,108,119,-95,0,-118,-106,-85,0,-116,-95,-53,0,-80,-64,-5,
 			0,58,45,30,0,14,24,41,0,19,34,57,0,32,40,72,0,40,56,72,0,32,56,88,0,40,56,110,0,57,71,
