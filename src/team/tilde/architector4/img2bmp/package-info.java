@@ -2,7 +2,7 @@
  * 
  */
 /**
- * @author Viktor "Architector #4" Kutcevich
+ * @author Architector #4
  *
  */
 package team.tilde.architector4.img2bmp;
