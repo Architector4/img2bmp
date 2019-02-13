@@ -67,7 +67,7 @@ public class IOStuff{
 			 if(result==1)
 			return inPath+": Input image doesn't exist!";
 		else if(result==2)
-			return inPath+": Is a directory!";
+			return inPath+": Is a directory! (tell me if you actually see this please)";
 		else if(result==3)
 			return inPath+": Failed to load the image! Unsupported format?";
 		else if(result==4)

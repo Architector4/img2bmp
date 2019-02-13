@@ -11,16 +11,18 @@ public class IMG2BMP{
 			"Converts images to BMP format with a specific palette.\r\n"
 					+"Made as a tool to make valid sprites for \"Cortex Command\" videogame.\r\n";
 
-	static final String helpMessage=
-			credit
-			+purpose
-			+"Usage: img2bmp [-ho] input [output]\r\n"
+	static final String usage=
+			"Usage: img2bmp [-ho] input [output]\r\n"
 			+"Converts input image to an 8-bit BMP file with custom palette\r\n"
 			+"If no output is specified, the image is saved with the input's name, "
 			+ "but with .bmp extension.\r\n\r\n"
 			+"Tags:\r\n"+"-h: Print this help and exit\r\n"
 			+"-o: Overwrite output if exists\r\n";
 
+	static final String helpMessage=
+			credit
+			+purpose
+			+usage;
 	public static final void main(String[] args){
 		// String workdir = System.getProperty("user.dir");
 
@@ -75,7 +77,11 @@ public class IMG2BMP{
 		}else{
 			System.err.println("No arguments - opening GUI...\r\n"
 					+ "For command-line operation, use -h or --help tag.");
-			new GUIStuff().initGUI();
+			try{
+				new GUIStuff().initGUI();
+			}catch(java.awt.HeadlessException e){
+				System.err.println("Actually, not opening GUI. Headless or whatever detected.");
+			}
 			return;
 		}
 

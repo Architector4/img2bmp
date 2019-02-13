@@ -58,14 +58,12 @@ public class ConvertStuff{
 			for(int i=0;i<widthoffset(width)*height;i++){
 
 				//Progress feedback in GUI.
-				if(gui!=null){
-					if(time+100<System.currentTimeMillis()){
-						time = System.currentTimeMillis();
-						gui.replaceLastLine(
-								"Progress: "
-										+nf.format((double)i/(widthoffset(width)*height)*100)
-										+"%");
-					}
+				if(gui!=null&&time+100<System.currentTimeMillis()){
+					time = System.currentTimeMillis();
+					gui.replaceLastLine(
+							"Progress: "
+									+nf.format((double)i/(widthoffset(width)*height)*100)
+									+"%");
 				}
 
 				if(bytegood(i,width)){
@@ -114,13 +112,13 @@ public class ConvertStuff{
 
 		}catch(java.io.IOException e){
 			out.close();
-			gui.replaceLastLine("");
+			if(gui!=null) gui.replaceLastLine("");
 			throw e;
 			//I'd use "Finally", but that won't allow me to throw this exception.
 		}
 		
 		out.close();
-		gui.replaceLastLine("");
+		if(gui!=null) gui.replaceLastLine("");
 
 
 
