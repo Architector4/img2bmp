@@ -31,25 +31,13 @@ public class ConvertStuff{
 
 		java.io.FileOutputStream out = new java.io.FileOutputStream(outPath);
 		try{
-			//java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream();
-			out.write(66); 					// 0 "B" in "BM" header.
-			out.write(77); 					// 1 "M" in "BM" header.
-			out.write(toByte(widthoffset(width)*height+1078)
-					);						// 2 File size.
-			out.write(toByte(0)); 			// 6 Reserved.
-			out.write(toByte(1024+54)); 	// 10 Pixel data start offset.
-			out.write(toByte(40)); 			// 14 Header size.
-			out.write(toByte(width));		// 18 Width.
-			out.write(toByte(height)); 		// 22 Height.
-			out.write(toByte((short)1)); 	// 26 Amount of images in this image. ._.
-			out.write(toByte((short)8)); 	// 28 Bits per pixel. This does 8, so let's do 8.
-			out.write(toByte(0)); 			// 30 Compression type. I don't like compression.
-			out.write(toByte(0)); 			// 34 Image size. Matters only if compressed, so meh.
-			out.write(toByte(0)); 			// 38 Preferred X printing resolution.
-			out.write(toByte(0)); 			// 42 Preferred Y printing resolution.
-			out.write(toByte(0)); 			// 46 Number of used Color Map entries.
-			out.write(toByte(0)); 			// 50 Number of significant Color Map entries.
-			out.write(Palette.PALETTE); 	// 54-1024 Palette.
+			out.write(BMPData.HEADER_1);				// 0-1			
+			out.write(toByte(widthoffset(width)*height+1078));	// 2 File size.
+			out.write(BMPData.HEADER_2);				// 6-17
+			out.write(toByte(width));				// 18 Width.
+			out.write(toByte(height)); 				// 22 Height.
+			out.write(BMPData.HEADER_3);				// 26-53
+			out.write(BMPData.PALETTE); 	// 54-1024 Palette.
 
 
 			long time = 0;
@@ -86,9 +74,9 @@ public class ConvertStuff{
 						double diffbest=-1.0; //How good best color matches
 						for(int u=1;u<256;u++){ // Iterate through all palette colors
 							final double diff = colorDistance(
-									unsignbyte( Palette.PALETTE[2+u*4])
-									,unsignbyte(Palette.PALETTE[1+u*4])
-									,unsignbyte(Palette.PALETTE[0+u*4])
+									unsignbyte( BMPData.PALETTE[2+u*4])
+									,unsignbyte(BMPData.PALETTE[1+u*4])
+									,unsignbyte(BMPData.PALETTE[0+u*4])
 									,pixel[0],pixel[1],pixel[2]);
 
 							if(diff==0){ // 0 means perfect - screw other colors.
