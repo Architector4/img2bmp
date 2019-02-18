@@ -56,12 +56,11 @@ public class ConvertStuff{
 
 				if(bytegood(i,width)){
 					final int color = in.getRGB(bytex(i,width),height-1-bytey(i,width));
-					final short[] pixel={
-							(short)((color>>16)&0xFF),		//R
-							(short)((color>>8 )&0xFF),		//G
-							(short)((color    )&0xFF),		//B
-							(short)((color>>24)&0xFF)};		//A
-					//I'm using short as an unsigned byte. Byte me.
+					final int[] pixel={
+							((color>>16)&0xFF),		//R
+							((color>>8 )&0xFF),		//G
+							((color    )&0xFF),		//B
+							((color>>24)&0xFF)};		//A
 
 
 					// This next bit of code grabs the color from the input image and compares it to
@@ -79,11 +78,10 @@ public class ConvertStuff{
 									,unsignbyte(BMPData.PALETTE[0+u*4])
 									,pixel[0],pixel[1],pixel[2]);
 
-							if(diff==0){ // 0 means perfect - screw other colors.
-								break;
-							} else if(diff<diffbest||diffbest==-1.0){ // If this color's better
+							if(diff<diffbest||diffbest==-1.0){ // If this color's better
 								diffbest=diff;
 								best=u;
+								if(diff==0.0) break; // Can't get any better than that!
 							}
 						}
 						out.write((byte)best);
@@ -159,10 +157,9 @@ public class ConvertStuff{
 		//4 4 4 4 4 8 8 8 8 12 12 12 12 16...
 	}
 
-	static short unsignbyte(byte in){
+	static int unsignbyte(byte in){
 		//Removes minus from byte.
-		//return (short)(in&0x7F+(in<0?128:0));
-		return (short)(in<0?  0xFF+in  :  in&0x7F);
+		return in<0?  0xFF+in  :  in&0x7F;
 	}
 	static int min(int a,int b){
 		//Returns smaller of 2 values.
@@ -185,6 +182,9 @@ public class ConvertStuff{
 			,int green2
 			,int blue2)
 	{
+		if(red1==red2&&green1==green2&&blue1==blue2){
+			return 0; // They are identical
+		}
 		double rmean = ( red1 + red2 )/2;
 		int r = red1 - red2;
 		int g = green1 - green2;
