@@ -1,40 +1,35 @@
 package team.tilde.architector4.img2bmp;
 
+// This contains the main function that is run when you launch the application.
+
 import java.io.File;
 
 public class IMG2BMP{
 
 	static final String credit =
-			"IMG2BMP Converter\r\n"
-					+"By Architector #4, 2019\r\n";
+		"IMG2BMP Converter\r\n"
+		+"By Architector #4, 2019\r\n";
 	static final String purpose =
-			"Converts images to BMP format with a specific palette.\r\n"
-					+"Made as a tool to make valid sprites for \"Cortex Command\" videogame.\r\n";
+		"Converts images to BMP format with a specific palette.\r\n"
+		+"Made as a tool to make valid sprites for \"Cortex Command\" videogame.\r\n";
 
 	static final String usage=
-			"Usage: img2bmp [-ho] input [output]\r\n"
-			+"Converts input image to an 8-bit BMP file with custom palette\r\n"
-			+"If no output is specified, the image is saved with the input's name, "
-			+ "but with .bmp extension.\r\n\r\n"
-			+"Tags:\r\n"+"-h: Print this help and exit\r\n"
-			+"-o: Overwrite output if exists\r\n";
+		"Usage: img2bmp [-ho] input [output]\r\n"
+		+"Converts input image to an 8-bit BMP file with custom palette\r\n"
+		+"If no output is specified, the image is saved with the input's name, " + "but with .bmp extension.\r\n\r\n"
+		+"Tags:\r\n"+"-h: Print this help and exit\r\n"
+		+"-o: Overwrite output if exists\r\n";
 
 	static final String helpMessage=
-			credit
-			+purpose
-			+usage;
+		credit
+		+purpose
+		+usage;
 	public static final void main(String[] args){
-		// String workdir = System.getProperty("user.dir");
-
-		// System.out.println("Current working directory is "+workdir);
 
 		String input="";
 		String output="";
 		boolean outputAuto=true;
 		boolean outputOverwrite=false;
-		// for(int i=0;i<args.length;i++){
-		// System.out.println(args[i]);
-		// }
 		if(args.length>0){
 			try{
 				int argsoffset=0;

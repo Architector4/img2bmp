@@ -1,5 +1,8 @@
 package team.tilde.architector4.img2bmp;
 
+// This contains a function used to do the full IMG>BMP conversion, and another that
+// is a wrapper for the first one except it outputs readable text of what went wrong.
+
 import java.io.File;
 
 public class IOStuff{
@@ -18,40 +21,51 @@ public class IOStuff{
 		
 		File in = new File(inPath);
 		
-		if(!in.exists()) return 1; //Input image doesn't exist
+		if(!in.exists()) return 1;
+		// Input image doesn't exist
 		
-		if(in.isDirectory()){
-			return 2; //Is directory. Look in IMG2BMP.java from line 89 to see how to handle them.
-		}
-		
+		if(in.isDirectory())
+			return 2; 
+		// Is directory. Look in IMG2BMP.java from line 89 to see how to handle them.
 		
 		java.awt.image.BufferedImage inImage;
+		
 		try{
 			inImage = javax.imageio.ImageIO.read(in);
 		}catch(Exception e){
 			System.out.println(e);
-				return 3; //Failed reading image
+			return 3; //Failed reading image
 		}
+
 		File outfile = new File(out);
+		
 		if(outfile.exists())
 			if(!overwrite) 
-				return 4; //File already exists
-
-		if(outfile.exists()&&!outfile.delete())
-			return 5; //Failed deleting old file
+				return 4;
+		// File already exists
+			else if(!outfile.delete())
+				return 5;
+		// Failed deleting old file
 		
 		try{
 			try{
-				java.nio.file.Files.createDirectories(outfile.getParentFile().toPath());
-			}catch(Exception e){} // Either it already exists, or the next catch's gonna handle that
+				java
+				.nio
+				.file
+				.Files
+				.createDirectories(outfile.getParentFile().toPath());
+			}catch(Exception e){}
+			// Either the folder to the output already exists,
+			// or the next catch block is appropriate for that.
 			ConvertStuff.toBMP(inImage,out,gui);
+
 		}catch(Exception e){
-			System.out.println(e);
-			e.printStackTrace();
-			return 6; //Failed saving image
+			return 6;
+			//Failed saving image
 		}
 			
 		return 0;
+		// All is well.
 	}
 
 	public static String convertImageHumanized(
@@ -64,21 +78,24 @@ public class IOStuff{
 		
 		
 		byte result = convertImage(inPath,out,overwrite,gui);
-			 if(result==1)
-			return inPath+": Input image doesn't exist!";
-		else if(result==2)
-			return inPath+": Is a directory! (tell me if you actually see this please)";
-		else if(result==3)
-			return inPath+": Failed to load the image! Unsupported format?";
-		else if(result==4)
-			return out+": Image already exists!"
-			+(commandline?" Set tag -o to overwrite instead.":"");
-		else if(result==5)
-			return inPath+": Failed overwriting old file! No permission?";	
-		else if(result==6)
-			return out+": Failed writing image! No space? No permission?";
+		switch(result){
+			case 0: return null;
 
-			return null;
+			case 1: return inPath+": Input image doesn't exist!";
+
+			case 2: return inPath+": Is a directory!";
+
+			case 3: return inPath+": Failed to load the image! Unsupported format?";
+
+			case 4: return out+": Image already exists!"
+			       +(commandline?" Set tag -o to overwrite instead.":"");
+
+			case 5: return inPath+": Failed overwriting old file! No permission?";	
+
+			case 6: return out+": Failed writing image! No space? No permission?";
+
+			default: return "WIBBLY WOBBLY IS MY CODE, SOMETHING BROKE HORRENDOUSLY.";
+		}
 	}
 	
 
@@ -86,14 +103,10 @@ public class IOStuff{
 		String name = in.getName();
 		if(name.lastIndexOf('.')!=-1) name = name.substring(0,name.lastIndexOf("."));
 		
-		return (in.getParent()==null ? "": in.getParent()) + File.separator + name + "." + newExt;
+		return (in.getParent()==null ? "": in.getParent())
+		       	+ File.separator + name + "." + newExt;
 		
 	}
-	
-	
-	//static byte convertFolder(String inPath,String out,GUIStuff printTo){
-	//	printTo.println("xd");
-	//	return -1;}
 }
 
 

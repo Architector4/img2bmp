@@ -1,5 +1,7 @@
 package team.tilde.architector4.img2bmp;
 
+//This contains the GUI stuff specific for the converter.
+
 import java.io.File;
 import java.awt.BorderLayout;
 import java.awt.Dimension;

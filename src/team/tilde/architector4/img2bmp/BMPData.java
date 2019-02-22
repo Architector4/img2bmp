@@ -1,6 +1,6 @@
 package team.tilde.architector4.img2bmp;
 
-
+// This contains bytes that are static across any result from my converter.
 
 public class BMPData{	
 	static final byte[] HEADER_1={

@@ -1,5 +1,8 @@
 package team.tilde.architector4.img2bmp;
 
+// This contains the function that does actual conversion.
+// It takes a BufferedImage, and writes the result as a file to the outPath.
+
 import java.text.NumberFormat;
 
 public class ConvertStuff{
@@ -9,17 +12,19 @@ public class ConvertStuff{
 			java.awt.image.BufferedImage in,
 			String outPath,
 			GUIStuff gui) 
-					throws java.io.FileNotFoundException,java.io.IOException
-	{
+			throws java.io.FileNotFoundException,java.io.IOException {
 		// If you are using this elsewhere, you can pass null as "gui" argument instead.
 		// It's to give feedback if the conversion takes a long time.
+		// Yeah, I know, meh coding practices. Please tell me how to make this better!
+		// And if you are actually using this function elsewhere, PLEASE TELL ME I WANT TO KNOW OwO
 
 		// This is based on this:
 		// http://www.dragonwins.com/domains/getteched/bmp/bmpfileformat.htm
 
-		//This is going to have a lot of obvious comments.
-		//I wrote them in case me in the future gets lost in this. lol
+		// This is going to have a lot of obvious comments.
+		// I wrote them in case me in the future gets lost in this. lol
 
+		// Just for the progress number.
 		NumberFormat nf = NumberFormat.getInstance();
 		nf.setMaximumFractionDigits(2);
 
@@ -31,65 +36,43 @@ public class ConvertStuff{
 
 		java.io.FileOutputStream out = new java.io.FileOutputStream(outPath);
 		try{
-			out.write(BMPData.HEADER_1);				// 0-1			
-			out.write(toByte(widthoffset(width)*height+1078));	// 2 File size.
+			out.write(BMPData.HEADER_1);				// 0-1
+			out.write(toByte(widthoffset(width)*height+1078));	// 2 File size
 			out.write(BMPData.HEADER_2);				// 6-17
-			out.write(toByte(width));				// 18 Width.
-			out.write(toByte(height)); 				// 22 Height.
+			out.write(toByte(width));				// 18 Width
+			out.write(toByte(height));				// 22 Height
 			out.write(BMPData.HEADER_3);				// 26-53
-			out.write(BMPData.PALETTE); 	// 54-1024 Palette.
+			out.write(BMPData.PALETTE);				// 54-1024 Palette
 
 
 			long time = 0;
 
-			//1078+ Image data
-			for(int i=0;i<widthoffset(width)*height;i++){
+			
+			for(int i=0;i<widthoffset(width)*height;i++){		// 1078+ Image data
 
 				//Progress feedback in GUI.
 				if(gui!=null&&time+100<System.currentTimeMillis()){
 					time = System.currentTimeMillis();
 					gui.replaceLastLine(
 							"Progress: "
-									+nf.format((double)i/(widthoffset(width)*height)*100)
-									+"%");
+							+nf.format( (double)i/(widthoffset(width)*height)*100 )
+							+"%"
+							);
 				}
 
 				if(bytegood(i,width)){
-					final int color = in.getRGB(bytex(i,width),height-1-bytey(i,width));
+					final int color = 
+						in.getRGB(
+								bytex(i,width)
+								,height-1-bytey(i,width)
+							 );
 					final int[] pixel={
-							((color>>16)&0xFF),		//R
-							((color>>8 )&0xFF),		//G
-							((color    )&0xFF),		//B
-							((color>>24)&0xFF)};		//A
-
-
-					// This next bit of code grabs the color from the input image and compares it to
-					// all colors in the palette until it finds the one that is closest, and assigns
-					// that.
-
-					if(pixel[3]==255){
-
-						int best=0; // Best color for the pixel
-						double diffbest=-1.0; //How good best color matches
-						for(int u=1;u<256;u++){ // Iterate through all palette colors
-							final double diff = colorDistance(
-									unsignbyte( BMPData.PALETTE[2+u*4])
-									,unsignbyte(BMPData.PALETTE[1+u*4])
-									,unsignbyte(BMPData.PALETTE[0+u*4])
-									,pixel[0],pixel[1],pixel[2]);
-
-							if(diff<diffbest||diffbest==-1.0){ // If this color's better
-								diffbest=diff;
-								best=u;
-								if(diff==0.0) break; // Can't get any better than that!
-							}
-						}
-						out.write((byte)best);
-					}else{
-						out.write(0);
-						// If it's transparent just use first color in the palette
-						// (which is R G B 255 0 255 in the included palette).
-					}
+						((color>>16)&0xFF),		// R
+						((color>>8 )&0xFF),		// G
+						((color    )&0xFF),		// B
+						((color>>24)&0xFF)		// A
+					};
+					out.write((byte)bestPaletteColor(pixel,BMPData.PALETTE));
 				}else{
 					// Or if it's a spacing byte then also don't bother.
 					out.write(0);
@@ -100,9 +83,9 @@ public class ConvertStuff{
 			out.close();
 			if(gui!=null) gui.replaceLastLine("");
 			throw e;
-			//I'd use "Finally", but that won't allow me to throw this exception.
+			// I'd use "Finally", but that won't allow me to throw this exception.
 		}
-		
+
 		out.close();
 		if(gui!=null) gui.replaceLastLine("");
 
@@ -110,10 +93,47 @@ public class ConvertStuff{
 
 	}
 
+	// This next bit of code grabs the color from the input image and compares it to
+	// all colors in the palette until it finds the one that is closest, and assigns that. 
+	public static int bestPaletteColor(int[] pixel,byte[] palette){
+		if(pixel.length!=4) return 0;
+		// Not a valid pixel
+
+		if(pixel[3]!=255) return 0;
+		// Is transparent
+
+		int best=0; 
+		// Best color for the pixel
+		double diffbest=-1.0;
+		//How good best color matches
+
+		for(int u=1;u<256;u++){ // Iterate through all palette colors
+
+			final double diff = colorDistance(
+					unsignbyte( palette[2+u*4])
+					,unsignbyte(palette[1+u*4])
+					,unsignbyte(palette[0+u*4])
+					,pixel[0]
+					,pixel[1]
+					,pixel[2]
+					);
+
+			if(diff<diffbest||diffbest==-1.0){ // If this color's better
+				diffbest=diff;
+				best=u;
+				if(diff==0.0) return best; // Can't get any better than that!
+			}
+		}
+
+		return best;
+	} 
+
+
+
 	static byte[] toByte(int a){ 
 		// Converts an int into 4 bytes packed into an array
 		return new byte[]{
-				(byte)((a)&0xFF)
+			(byte)((a)&0xFF)
 				,(byte)((a>>8)&0xFF)
 				,(byte)((a>>16)&0xFF)
 				,(byte)(a>>24&0xFF)
@@ -123,7 +143,7 @@ public class ConvertStuff{
 	static byte[] toByte(short a){ 
 		// Converts a short into 2 bytes packed into an array
 		return new byte[]{
-				(byte)((a)&0xFF)
+			(byte)((a)&0xFF)
 				,(byte)((a>>8)&0xFF)
 		};
 	}
