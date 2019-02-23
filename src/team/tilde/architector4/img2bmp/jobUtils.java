@@ -1,5 +1,8 @@
 package team.tilde.architector4.img2bmp;
 
+// This contains code used to get a list of files needed to process from a directory input
+// And then figures appropriate output path for each files
+
 import java.io.File;
 import java.util.ArrayList;
 import javax.swing.filechooser.FileFilter;
