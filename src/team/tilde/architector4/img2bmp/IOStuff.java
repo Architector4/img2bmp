@@ -85,7 +85,7 @@ public class IOStuff{
 
 			case 6: return out+": Failed writing image! No space? No permission?";
 
-			default: return "WIBBLY WOBBLY IS MY CODE, SOMETHING BROKE HORRENDOUSLY.";
+			default: return "The thing returned an unknown result. I screwed up. Let me know.";
 		}
 	}
 	
@@ -99,5 +99,3 @@ public class IOStuff{
 		
 	}
 }
-
-

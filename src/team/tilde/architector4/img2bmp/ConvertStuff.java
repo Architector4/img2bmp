@@ -25,81 +25,83 @@ public class ConvertStuff{
 		// I wrote them in case me in the future gets lost in this. lol
 
 		// Just for the progress number.
-		NumberFormat nf = NumberFormat.getInstance();
-		nf.setMaximumFractionDigits(2);
+			NumberFormat nf = NumberFormat.getInstance();
+			nf.setMaximumFractionDigits(2);
 
 
 
-		final int width=in.getWidth();
-		final int height=in.getHeight();
+			final int width=in.getWidth();
+			final int height=in.getHeight();
 
 
-		java.io.FileOutputStream out = new java.io.FileOutputStream(outPath);
-		try{
-			out.write(BMPData.HEADER_1);				// 0-1
-			out.write(toByte(widthoffset(width)*height+1078));	// 2 File size
-			out.write(BMPData.HEADER_2);				// 6-17
-			out.write(toByte(width));				// 18 Width
-			out.write(toByte(height));				// 22 Height
-			out.write(BMPData.HEADER_3);				// 26-53
-			out.write(BMPData.PALETTE);				// 54-1024 Palette
+			java.io.FileOutputStream out = new java.io.FileOutputStream(outPath);
+			try{
+				out.write(BMPData.HEADER_1);				// 0-1
+				out.write(toByte(widthoffset(width)*height+1078));	// 2 File size
+				out.write(BMPData.HEADER_2);				// 6-17
+				out.write(toByte(width));				// 18 Width
+				out.write(toByte(height));				// 22 Height
+				out.write(BMPData.HEADER_3);				// 26-53
+				out.write(BMPData.PALETTE);				// 54-1024 Palette
 
 
-			long time = 0;
+				long time = 0;
 
-			
-			for(int i=0;i<widthoffset(width)*height;i++){		// 1078+ Image data
 
-				//Progress feedback in GUI.
-				if(gui!=null&&time+100<System.currentTimeMillis()){
-					time = System.currentTimeMillis();
-					gui.replaceLastLine(
-							"Progress: "
-							+nf.format( (double)i/(widthoffset(width)*height)*100 )
-							+"%"
-							);
+				for(int i=0;i<widthoffset(width)*height;i++){		// 1078+ Image data
+
+					//Progress feedback in GUI.
+					if(gui!=null&&time+100<System.currentTimeMillis()){
+						time = System.currentTimeMillis();
+						gui.replaceLastLine(
+								"Progress: "
+								+nf.format(
+									(double)i
+									/(widthoffset(width)*height)
+									*100)
+								+"%"
+								);
+					}
+
+					if(bytegood(i,width)){ // If it's not a spacing byte
+						final int color = 
+							in.getRGB(
+									bytex(i,width)
+									,height-1-bytey(i,width)
+								 );
+						out.write((byte)bestPaletteColor(color,BMPData.PALETTE));
+					}else{
+						// Or if it's a spacing byte then don't bother.
+						out.write(0);
+					}
 				}
 
-				if(bytegood(i,width)){
-					final int color = 
-						in.getRGB(
-								bytex(i,width)
-								,height-1-bytey(i,width)
-							 );
-					final int[] pixel={
-						((color>>16)&0xFF),		// R
-						((color>>8 )&0xFF),		// G
-						((color    )&0xFF),		// B
-						((color>>24)&0xFF)		// A
-					};
-					out.write((byte)bestPaletteColor(pixel,BMPData.PALETTE));
-				}else{
-					// Or if it's a spacing byte then also don't bother.
-					out.write(0);
-				}
+			}catch(java.io.IOException e){
+				out.close();
+				if(gui!=null) gui.replaceLastLine("");
+				throw e;
+				// I'd use "Finally", but that won't allow me to throw this exception.
 			}
 
-		}catch(java.io.IOException e){
 			out.close();
 			if(gui!=null) gui.replaceLastLine("");
-			throw e;
-			// I'd use "Finally", but that won't allow me to throw this exception.
-		}
-
-		out.close();
-		if(gui!=null) gui.replaceLastLine("");
 
 
 
-	}
+			}
 
 	// This next bit of code grabs the color from the input image and compares it to
 	// all colors in the palette until it finds the one that is closest, and assigns that. 
-	public static int bestPaletteColor(int[] pixel,byte[] palette){
-		if(pixel.length!=4) return 0;
-		// Not a valid pixel
+	public static int bestPaletteColor(int color,byte[] palette){
 
-		if(pixel[3]!=255) return 0;
+		//final int[] pixel={
+		//	((color>>16)&0xFF),		// R
+		//	((color>>8 )&0xFF),		// G
+		//	((color    )&0xFF),		// B
+		//	((color>>24)&0xFF)		// A
+		//};
+
+		if(((color>>24)&0xFF)!=255) return 0;
 		// Is transparent
 
 		int best=0; 
@@ -110,18 +112,18 @@ public class ConvertStuff{
 		for(int u=1;u<256;u++){ // Iterate through all palette colors
 
 			final double diff = colorDistance(
-					unsignbyte( palette[2+u*4])
+					unsignbyte (palette[2+u*4])
 					,unsignbyte(palette[1+u*4])
 					,unsignbyte(palette[0+u*4])
-					,pixel[0]
-					,pixel[1]
-					,pixel[2]
+					,((color>>16)&0xFF)		// R
+					,((color>>8 )&0xFF)		// G
+					,( color     &0xFF)		// B
 					);
 
 			if(diff<diffbest||diffbest==-1.0){ // If this color's better
 				diffbest=diff;
 				best=u;
-				if(diff==0.0) return best; // Can't get any better than that!
+				if(diff==0.0d) return best; // Can't get any better than that!
 			}
 		}
 
@@ -203,7 +205,7 @@ public class ConvertStuff{
 			,int blue2)
 	{
 		if(red1==red2&&green1==green2&&blue1==blue2){
-			return 0; // They are identical
+			return 0.0d; // They are identical
 		}
 		double rmean = ( red1 + red2 )/2;
 		int r = red1 - red2;

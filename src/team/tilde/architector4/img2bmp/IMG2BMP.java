@@ -16,8 +16,10 @@ public class IMG2BMP{
 	static final String usage=
 		"Usage: img2bmp [-ho] input [output]\r\n"
 		+"Converts input image to an 8-bit BMP file with custom palette\r\n"
-		+"If no output is specified, the image is saved with the input's name, " + "but with .bmp extension.\r\n\r\n"
-		+"Tags:\r\n"+"-h: Print this help and exit\r\n"
+		+"If no output is specified, the image is saved with the input's name, "
+		+"but with .bmp extension.\r\n\r\n"
+		+"Tags:\r\n"
+		+"-h: Print this help and exit\r\n"
 		+"-o: Overwrite output if exists\r\n";
 
 	static final String helpMessage=
@@ -26,51 +28,50 @@ public class IMG2BMP{
 		+usage;
 	public static final void main(String[] args){
 
-		String input="";
-		String output="";
-		boolean outputAuto=true;
+		String input=null;
+		String output=null;
 		boolean outputOverwrite=false;
+		
 		if(args.length>0){
-			try{
-				int argsoffset=0;
-				boolean argsoffseted=false;
-				while(!argsoffseted){
-					if(args[argsoffset].charAt(0)=='-'){
-
-						if(args[argsoffset].charAt(1)=='-'){
-							if(args[argsoffset].equals("--help")){
-								System.out.println(helpMessage);
-							}
-						}else{
-							java.util.stream.IntStream chars=args[argsoffset].substring(1).chars();
-							for(int i:chars.toArray()){
-
-								if((char)i=='h'){
-									System.out.println(helpMessage);
-									return;
-								}else if((char)i=='o'){
-									outputOverwrite=true;
-								}else{
-									System.err.println("Unknown argument "+(char)i);
-								}
-							}
-							argsoffset++;
+			for(String i:args){
+				if(i.charAt(0)=='-'){
+					if(i.charAt(1)=='-'){
+						if(i.equals("--help")){
+							System.out.println(helpMessage);
+							return;
 						}
 					}else{
-						argsoffseted=true;
+						for(int u=1;u<i.length();u++){
+							switch(i.charAt(u)){
+								case 'h':
+									System.out.println(helpMessage);
+									return;
+								case 'o':
+									outputOverwrite=true;
+									break;
+								default:
+									System.err.println(
+											i.charAt(u)
+											+": Unknown argument.");
+							}
+						}
 					}
+				}else{
+					if(input==null){
+						input=i;
+						continue;
+					}
+					if(output==null){
+						output=i;
+						continue;
+					}
+					System.err.println("Too many arguments supplied!");
+					return;
 				}
-				input=args[argsoffset+0];
-				if(args.length>argsoffset+1){
-					output=args[argsoffset+1];
-					outputAuto=false;
-				}
-			}catch(Exception e){
-				System.err.println("Failed parsing arguments! See -h or --help for syntax.");
-				return;
 			}
-		}else{
-			System.err.println("No arguments - opening GUI...\r\n"
+		}
+		if(input==null){
+			System.err.println("No input specified - opening GUI...\r\n"
 					+ "For command-line operation, use -h or --help tag.");
 			try{
 				new GUIStuff().initGUI();
@@ -80,10 +81,12 @@ public class IMG2BMP{
 			return;
 		}
 
-		if(outputAuto){
+		if(output==null){
 			output=IOStuff.switchExtension(new File(input),"bmp");
 		}
+		
 
+		// Handling a directory...
 		if(new File(input).isDirectory()){
 			java.util.ArrayList<Job> jobs = jobUtils.convertFolder(
 					new File(input)
@@ -92,7 +95,6 @@ public class IMG2BMP{
 					,(javax.swing.filechooser.FileFilter)new GUIStuff.ImageFilter());
 
 			for(Job u:jobs){
-				//				System.out.println("Converting "+u.inFile.getAbsolutePath()+"...");
 				String result = IOStuff.convertImageHumanized(
 						u.inFile.getAbsolutePath()
 						,IOStuff.switchExtension(u.outFile,"bmp")
@@ -101,7 +103,6 @@ public class IMG2BMP{
 				if(result!=null)
 					System.err.println(result);
 			}
-			//			System.out.println("Done!");
 
 		}else{
 			final String result=IOStuff.convertImageHumanized(
@@ -115,11 +116,3 @@ public class IMG2BMP{
 		return;
 	}
 }
-
-
-
-
-
-
-
-
