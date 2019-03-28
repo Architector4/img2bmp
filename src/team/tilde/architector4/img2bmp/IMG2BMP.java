@@ -1,9 +1,10 @@
 package team.tilde.architector4.img2bmp;
 
-// This contains the main function that is run when you launch the application.
-
 import java.io.File;
 
+/**
+ * This is the main class to run, which contains <code>main</code> function.
+ */
 public class IMG2BMP{
 
 	static final String credit =

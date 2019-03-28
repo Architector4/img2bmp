@@ -1,14 +1,14 @@
 package team.tilde.architector4.img2bmp;
 
-// This contains code used to get a list of files needed to process from a directory input
-// And then figures appropriate output path for each files
-
 import java.io.File;
 import java.util.ArrayList;
 import javax.swing.filechooser.FileFilter;
 
+/**
+ * This class contains code used to get a list of files that are to be processed in a folder,
+ * as well as paths for processed versions.
+ */
 public class jobUtils{
-
 	public static String getRelativePath(File of,File to){
 		//"of" is for example /home/user/thing.png
 		//"to" is for example /home/

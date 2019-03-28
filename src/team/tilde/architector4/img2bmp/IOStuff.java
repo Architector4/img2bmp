@@ -1,12 +1,12 @@
 package team.tilde.architector4.img2bmp;
 
-// This contains a function used to do the full IMG>BMP conversion, and another that
-// is a wrapper for the first one except it outputs human readable text of what went wrong.
-
 import java.io.File;
 
+/**
+ * This contains a function used to do the full file>conversion>file pipeline for a single file.
+ * <br>It also contains a function used to switch file extension.
+ */
 public class IOStuff{
-
 
 	public static byte convertImage(String inPath,String out, boolean overwrite,GUIStuff gui){
 		
@@ -17,7 +17,7 @@ public class IOStuff{
 		
 		if(in.isDirectory())
 			return 2; 
-		// Is a directory. Look in IMG2BMP.java from line 89 to see how to handle them.
+		// Is a directory. Look in IMG2BMP.java from line 90 to see how to handle them.
 		
 		java.awt.image.BufferedImage inImage;
 		

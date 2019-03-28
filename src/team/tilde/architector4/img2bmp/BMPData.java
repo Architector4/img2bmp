@@ -1,17 +1,19 @@
 package team.tilde.architector4.img2bmp;
 
-// This contains bytes that are static across any result from my converter.
-
+/**
+ * Contains parts of BMP file header that are static with this converter.
+ * It also contains a palette this converter uses.
+ */
 public class BMPData{	
-	static final byte[] HEADER_1={
+	static byte[] HEADER_1={
 		66,		// 0  "B" in "BM" header
-		77};		// 1  "M" in "BM" header
+		77};	// 1  "M" in "BM" header
 
 				// 2  File size
 				// 3
 				// 4
 				// 5
-	static final byte[] HEADER_2={
+	static byte[] HEADER_2={
 		0,		// 6  Reserved
 		0,		// 7 
 		0,		// 8 
@@ -33,7 +35,7 @@ public class BMPData{
 				// 23
 				// 24
 				// 25
-	static final byte[] HEADER_3={
+	static byte[] HEADER_3={
 		1,		// 26 Amount of images in this image
 		0,		// 27
 		8,		// 28 Bits pet pixel

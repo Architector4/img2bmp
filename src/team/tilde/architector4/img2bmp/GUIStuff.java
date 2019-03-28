@@ -1,7 +1,5 @@
 package team.tilde.architector4.img2bmp;
 
-//This contains the GUI stuff specific for the converter.
-
 import java.io.File;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -21,23 +19,38 @@ import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 
+/**
+ * Class containing the graphical user interface of this converter.
+ */
 public class GUIStuff implements ActionListener{
 
+	/** Contains all input files chosen by the user. */
 	File[] input;
+	/** Root folder which contains all the input files. */
 	File inputRoot;
-	float process;
+	/** Button that, when pressed, opens selection
+	 * dialog to select files for conversion. */
 	JButton selectButton;
+	/** Button that, when pressed, opens selection
+	 * dialog to select destination of conversion results. */
 	JButton saveButton;
+	/** Scroll pane used to scroll the text area. */
 	JScrollPane textAreaScroll;
+	/** Text area containing operation log and other information. */
 	volatile JTextArea textArea;
+	/** File chooser used to choose files for conversion. */
 	JFileChooser fileChooserSelect;
+	/** File chooser used to choose destination of conversion results. */
 	JFileChooser fileChooserSave;
-
+	/** Frame that contains all the GUI elements. */
 	JFrame frame;
 
+	/** True if conversion is happening. */
 	volatile boolean busy = false;
 
-
+	/**
+	 * Puts interface elements into a window and then spawns it
+	 */
 	public void initGUI(){
 		// frame.getContentPane().add(startButton, BorderLayout.LINE_END);
 		// GUIStuff pane = new GUIStuff();
@@ -123,6 +136,9 @@ public class GUIStuff implements ActionListener{
 
 	}
 
+	/**
+	 * Is triggered when a button is pressed.
+	 */
 	public void actionPerformed(ActionEvent e){ //A button was pressed!
 		if(e.getSource()==selectButton){
 			fileChooserSelect.setCurrentDirectory(fileChooserSave.getCurrentDirectory());
@@ -154,25 +170,20 @@ public class GUIStuff implements ActionListener{
 		}
 	}
 
+	/**
+	 * Class that launches the conversion process on a separate thread.
+	 */
 	class Task extends SwingWorker<Void,Void>{
 		protected Void doInBackground() throws Exception{
 			convertStuff();
 			return null;
 		}
 	}
-
-	public void bun(){
-		try{
-
-			selectButton.setText("OW");
-			Thread.sleep(2000);
-			selectButton.setText("oww...");
-
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
-
+	
+	/**
+	 * Prints text into the GUI's text field.
+	 * @param text Text to be written
+	 */
 	public void print(String text){
 		if(text!=null){
 			textArea.append(text);
@@ -180,6 +191,10 @@ public class GUIStuff implements ActionListener{
 		}
 	}
 
+	/**
+	 * Replaces the last line in GUI's text field.
+	 * @param text Text that the line is replaced with.
+	 */
 	public void replaceLastLine(String text){
 		try{
 			textArea.replaceRange(
@@ -189,15 +204,25 @@ public class GUIStuff implements ActionListener{
 					);
 			
 		}catch(BadLocationException e){
-			//This literally can't happen.
+			// This shouldn't happen unless the class is modified.
 		}
 	}
 
+	/**
+	 * Prints text into the GUI's text field and adds a newline.
+	 * @param text Text to be written
+	 */
 	public void println(String text){
 		if(text!=null) print(text+"\r\n");
 	}
 
-
+	/**
+	 * Class that extends {@link FileFilter}
+	 * and contains the check that returns <code>true</code>
+	 * for any image files.
+	 * 
+	 * @see FileFilter
+	 */
 	public static class ImageFilter extends FileFilter{
 		//True if the input file is an image or a folder.
 		public boolean accept(File f){
@@ -218,7 +243,13 @@ public class GUIStuff implements ActionListener{
 			return "Images (.bmp, .png, .jpg, .jpeg, .gif, .tif, .tiff)";
 		}
 	}
-
+	/**
+	 * Class that extends {@link FileFilter}
+	 * and contains the check that returns <code>true</code>
+	 * for any directories.
+	 * 
+	 * @see FileFilter
+	 */
 	public class DirectoryFilter extends FileFilter{
 		//True if the input is a folder
 		public boolean accept(File f){
@@ -229,6 +260,13 @@ public class GUIStuff implements ActionListener{
 			return "Folder";
 		}
 	}
+	/**
+	 * Class that extends {@link FileFilter}
+	 * and contains the check that returns <code>true</code>
+	 * for BMP files.
+	 * 
+	 * @see FileFilter
+	 */
 	public class BMPFilter extends FileFilter{
 		public boolean accept(File f){
 			if(getExtension(f).equals("bmp")) return true;
@@ -241,6 +279,10 @@ public class GUIStuff implements ActionListener{
 
 
 
+	/**
+	 * Gets the extension of the file - part of its name after the period.
+	 * @param f File whose extension is needed.
+	 */
 	public static String getExtension(File f){
 		//Get name, trim it to the last dot, to lowercase.
 		//Sorry, I like one-liners lol
@@ -248,7 +290,9 @@ public class GUIStuff implements ActionListener{
 	}
 
 
-
+	/**
+	 * Performs conversion on items stores in variables of this class.
+	 */
 	public void convertStuff(){
 
 		selectButton.setEnabled(false);	
