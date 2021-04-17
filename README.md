@@ -21,5 +21,6 @@ If no parameters are specified, it will open a GUI with 2 buttons and a log text
 ### Inspired by this guide in the game's forums:
 https://steamcommunity.com/sharedfiles/filedetails/?id=233129307
 
+---
 
-_(also this is my first github repository, so sorry if this isn't really professional enough or something lol)_
+Please note that this is my first GitHub repository, and this code is really old, amateur and possibly quite messy. But it does the job though - the images produced by it seem to work just fine in Cortex Command.
