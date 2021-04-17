@@ -5,18 +5,19 @@ img2bmp.jar is the compiled file ready to use.
 
 ### Usage:
 
-`img2bmp [-ho] input [output]`
+Run the jar file either directly by clicking on it, or via the command line:
 
-`-h` tag prints help and info.
+`java -jar img2bmp.jar [-h] [-o] INPUTFILE OUTPUTFILE`
 
-`-o` tag allows overwriting existing files.
+`-h` - print help and info and exit.
 
-If no output is specified, the result is saved alongside input image with .bmp extension.
+`-o` - allow overwriting existing files.
+
+If no output file is specified, the result is saved alongside input image with .bmp extension.
 
 If the original file has .bmp extension by itself and `-o` is not specified, it will give the "file exists" error.
 
-
-If no parameters are specified, it will open a GUI with 2 buttons and a log text box.
+If no parameters are specified, a GUI is opened.
 
 ### Inspired by this guide in the game's forums:
 https://steamcommunity.com/sharedfiles/filedetails/?id=233129307
