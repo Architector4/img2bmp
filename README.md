@@ -1,7 +1,7 @@
 # img2bmp
 A Java tool that converts images to 8-bit BMP images compatible with Cortex Command videogame by using the color palette that the game uses.
 
-img2bmp.jar is the compiled file ready to use.
+Use "Releases" tab on the right to download a usable version.
 
 ### Usage:
 
