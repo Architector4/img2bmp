@@ -3,6 +3,8 @@
 
 packname="team/tilde/architector4/img2bmp"
 
+# Create bin directory
+mkdir -p bin/$packname
 # Compile Java code to .class files
 javac src/$packname/*.java &&
 # Move .class files to bin directory
