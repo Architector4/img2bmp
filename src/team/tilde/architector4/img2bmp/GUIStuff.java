@@ -299,6 +299,13 @@ public class GUIStuff implements ActionListener{
 		saveButton.setEnabled(false);
 
 
+		// TODO: fix this
+		// this just makes new filters and tries to remove them,
+		// instead of actually removing the currently set filters,
+		// and that results in nothing getting removed and the list
+		// getting poluted with more and more filters
+
+		// i am a good programmer i promise
 		fileChooserSave.removeChoosableFileFilter(new BMPFilter());
 		fileChooserSave.removeChoosableFileFilter(new DirectoryFilter());
 
