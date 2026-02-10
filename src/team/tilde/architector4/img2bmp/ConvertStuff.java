@@ -6,30 +6,30 @@ import java.text.NumberFormat;
  * Contains the function that performs the conversion.
  * It also contains a bunch of functions needed for that function.
  */
-public class ConvertStuff{
+public class ConvertStuff {
 
 	/**
 	 * Converts an image to an 8-bit BMP and saves it to a file.
 	 * <p>
 	 * It uses a palette defined in {@link BMPData} class
 	 * to encode the colors.
-	 * 
+	 *
 	 * @param	in		Image object that would be converted
 	 * @param	outPath	Path to the output file, where the result will be written
 	 * @param	gui		Reference to a object of class <code>GUIStuff</code>
 	 * 					to report progress to it
-	 * 
+	 *
 	 * @throws java.io.IOException	Unable to create/write to output file.
 	 */
 	public static void toBMP(
 			java.awt.image.BufferedImage in,
 			String outPath,
-			GUIStuff gui) 
+			GUIStuff gui)
 		throws java.io.IOException {
 			// If you are using this elsewhere, you can pass null as "gui" argument instead.
 			// It's to give feedback if the conversion takes a long time.
 			// Yeah, I know, meh coding practices. Please tell me how to make this better!
-			// And if you are actually using this function elsewhere, 
+			// And if you are actually using this function elsewhere,
 			// PLEASE TELL ME I WANT TO KNOW OwO
 
 			// This is based on this:
@@ -106,12 +106,12 @@ public class ConvertStuff{
 	 * Finds color in <code>palette</code> that is closest to <code>color</code>.<br>
 	 * <b>Note</b> that alpha channel is ignored.<br>
 	 * <b>Note</b> that color and palette have different input color orders.
-	 * 
+	 *
 	 * @param color		Input color, encoded in an <code>int</code> of format
 	 * 					<code>0xRRGGBBAA</code>.
 	 * @param palette	Input palette, consisting of 4 bytes per color
 	 * 					in order of blue, green, red, alpha.
-	 * 
+	 *
 	 */
 	public static int bestPaletteColor(int color,byte[] palette){
 
@@ -122,20 +122,21 @@ public class ConvertStuff{
 		//	((color>>24)&0xFF)		// A
 		//};
 
-		if(((color>>24)&0xFF)!=255) return 0;
 		// Is transparent
+		if(((color>>24)&0xFF)!=255) return 0;
 
-		int best=0; 
 		// Best color for the pixel
+		int best=0;
+		// How good best color matches
 		double diffbest=-1.0;
-		//How good best color matches
 
-		for(int u=1;u<palette.length/4;u++){ // Iterate through all palette colors
+		// Iterate through all palette colors in 4-byte stride.
+		for(int u = 0; u < palette.length; u += 4){
 
 			final double diff = colorDistance(
-					unsignbyte (palette[2+u*4])	// R
-					,unsignbyte(palette[1+u*4])	// G
-					,unsignbyte(palette[0+u*4])	// B
+					unsignbyte (palette[2+u])	// R
+					,unsignbyte(palette[1+u])	// G
+					,unsignbyte(palette[0+u])	// B
 					,((color>>16)&0xFF)		// R
 					,((color>>8 )&0xFF)		// G
 					,( color     &0xFF)		// B
@@ -144,17 +145,17 @@ public class ConvertStuff{
 			if(diff<diffbest||diffbest==-1.0){ // If this color's better
 				diffbest=diff;
 				best=u;
-				if(diff==0.0d) return best; // Can't get any better than that!
+				if(diff==0.0d) return best / 4; // Can't get any better than that!
 			}
 		}
 
-		return best;
-	} 
+		return best / 4;
+	}
 
 
 	/**
 	 * Converts an <code>int</code> into 4 bytes packed as an array.
-	 * @param a <code>int</code> to be converted into an array. 
+	 * @param a <code>int</code> to be converted into an array.
 	 */
 	static byte[] toByte(int a){
 		return new byte[]{
@@ -166,9 +167,9 @@ public class ConvertStuff{
 	}
 	/**
 	 * Converts an <code>short</code> into 2 bytes packed as an array.
-	 * @param a <code>short</code> to be converted into an array. 
+	 * @param a <code>short</code> to be converted into an array.
 	 */
-	static byte[] toByte(short a){ 
+	static byte[] toByte(short a){
 		return new byte[]{
 			(byte)((a)&0xFF)
 				,(byte)((a>>8)&0xFF)
@@ -180,7 +181,7 @@ public class ConvertStuff{
 	 * @param y Y position of the pixel
 	 * @param width Width of the image
 	 */
-	static int bytepos(int x,int y,int width){ 
+	static int bytepos(int x,int y,int width){
 		// Converts input X Y coordinates into a byte number
 		return x+y*(widthoffset(width));
 	}
@@ -190,7 +191,7 @@ public class ConvertStuff{
 	 * @param in Byte number
 	 * @param width Width of the image
 	 */
-	static int bytex(int in,int width){ 
+	static int bytex(int in,int width){
 		// Converts a byte number into an X coordinate
 		return in%(widthoffset(width));
 	}
@@ -199,7 +200,7 @@ public class ConvertStuff{
 	 * @param in Byte number
 	 * @param width Width of the image
 	 */
-	static int bytey(int in,int width){ 
+	static int bytey(int in,int width){
 		// Converts a byte number into an Y coordinate
 		return in/(widthoffset(width));
 	}
@@ -210,7 +211,7 @@ public class ConvertStuff{
 	 * @param in Byte number
 	 * @param width Width of the image
 	 */
-	static boolean bytegood(int in,int width){ 
+	static boolean bytegood(int in,int width){
 		// Can I write in this byte, or it's one of
 		// those spacing bytes at the end of each horizontal line?
 		return in%(widthoffset(width))<width;
@@ -235,7 +236,7 @@ public class ConvertStuff{
 	 */
 	static int unsignbyte(byte in){
 		//Removes minus from byte.
-		return in<0?  0xFF+in  :  in&0x7F;
+		return in < 0 ? 0xFF+in  :  in&0x7F;
 	}
 	/**
 	 * Returns the smaller number out of two.
